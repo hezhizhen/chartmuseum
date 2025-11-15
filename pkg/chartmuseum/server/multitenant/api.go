@@ -19,7 +19,7 @@ package multitenant
 import (
 	"fmt"
 	"net/http"
-	pathutil "path/filepath"
+	pathutil "path"
 	"sort"
 	"strings"
 
@@ -47,8 +47,11 @@ func (server *MultiTenantServer) getAllCharts(log cm_logger.LoggingFn, repo stri
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
+	if offset >= len(keys) {
+		return result, nil
+	}
 	end := offset + limit
-	if len(keys) < end {
+	if limit == -1 || len(keys) < end {
 		end = len(keys)
 	}
 	for i := offset; i < end; i++ {

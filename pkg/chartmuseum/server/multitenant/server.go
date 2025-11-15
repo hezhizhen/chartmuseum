@@ -217,6 +217,7 @@ func (server *MultiTenantServer) CheckTemplateFilesExist(path string, logger *cm
 		logger.Errorf("Failed to open template folder %s", path)
 		return false
 	}
+	defer webTemplateFolder.Close()
 	templates, err := webTemplateFolder.Readdir(0)
 	if err != nil {
 		server.Logger.Errorf("Error reading template files from %s", path)

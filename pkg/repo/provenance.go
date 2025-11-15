@@ -36,6 +36,12 @@ var (
 
 	// ErrorInvalidProvenanceFile is raised when a provenance file is invalid
 	ErrorInvalidProvenanceFile = errors.New("invalid provenance file")
+
+	// nameRegex is used to extract chart name from provenance file content
+	nameRegex = regexp.MustCompile(`\nname:[ *](.+)`)
+
+	// versionRegex is used to extract chart version from provenance file content
+	versionRegex = regexp.MustCompile(`\nversion:[ *](.+)`)
 )
 
 // ProvenanceFilenameFromNameVersion returns a provenance filename from a name and version
@@ -49,8 +55,8 @@ func ProvenanceFilenameFromContent(content []byte) (string, error) {
 	contentStr := string(content[:])
 
 	hasPGPBegin := strings.HasPrefix(contentStr, "-----BEGIN PGP SIGNED MESSAGE-----")
-	nameMatch := regexp.MustCompile("\nname:[ *](.+)").FindStringSubmatch(contentStr)
-	versionMatch := regexp.MustCompile("\nversion:[ *](.+)").FindStringSubmatch(contentStr)
+	nameMatch := nameRegex.FindStringSubmatch(contentStr)
+	versionMatch := versionRegex.FindStringSubmatch(contentStr)
 
 	if !hasPGPBegin || len(nameMatch) != 2 || len(versionMatch) != 2 {
 		return "", ErrorInvalidProvenanceFile

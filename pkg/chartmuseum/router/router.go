@@ -185,9 +185,15 @@ func (router *Router) Start(port int) {
 
 	if router.TlsCert != "" && router.TlsKey != "" {
 		if router.TlsCACert != "" {
-			keypair, _ := tls.LoadX509KeyPair(router.TlsCert, router.TlsKey)
+			keypair, err := tls.LoadX509KeyPair(router.TlsCert, router.TlsKey)
+			if err != nil {
+				router.Logger.Fatal("Failed to load TLS key pair: ", err)
+			}
 			certpool := x509.NewCertPool()
-			capem, _ := os.ReadFile(router.TlsCACert)
+			capem, err := os.ReadFile(router.TlsCACert)
+			if err != nil {
+				router.Logger.Fatal("Failed to read CA certificate: ", err)
+			}
 			if !certpool.AppendCertsFromPEM(capem) {
 				router.Logger.Fatal("Can't parse CA certificate file")
 			}

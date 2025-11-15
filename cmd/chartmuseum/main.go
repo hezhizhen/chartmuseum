@@ -51,7 +51,9 @@ func main() {
 	app.Usage = "Helm Chart Repository with support for Amazon S3, Google Cloud Storage, Oracle Cloud Infrastructure Object Storage and Openstack"
 	app.Action = cliHandler
 	app.Flags = config.CLIFlags
-	app.Run(os.Args)
+	if err := app.Run(os.Args); err != nil {
+		crash(err)
+	}
 }
 
 func cliHandler(c *cli.Context) {

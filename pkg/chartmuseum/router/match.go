@@ -204,7 +204,7 @@ func url2pattern(url string) string {
 }
 
 func getDepth(url, routePath string) int {
-	r, _ := regexp.Compile(url2pattern(routePath))
+	r := regexp.MustCompile(url2pattern(routePath))
 	if r.MatchString(url) {
 		oriNum := len(strings.Split(routePath, "/"))
 		patNum := len(strings.Split(url, "/"))

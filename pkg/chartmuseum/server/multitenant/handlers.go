@@ -467,7 +467,7 @@ func (server *MultiTenantServer) postPackageAndProvenanceRequestHandler(c *gin.C
 		Content:      chartContent,
 		LastModified: time.Now()})
 	if chartErr != nil {
-		log(cm_logger.ErrorLevel, "cannot get chart from content", zap.Error(err), zap.Binary("content", chartContent))
+		log(cm_logger.ErrorLevel, "cannot get chart from content", zap.Error(chartErr), zap.Binary("content", chartContent))
 	}
 
 	server.emitEvent(c, repo, action, chart)
