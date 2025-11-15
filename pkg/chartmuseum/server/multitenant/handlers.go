@@ -531,12 +531,18 @@ func (server *MultiTenantServer) getChartAndProvFiles(req *http.Request, repo st
 }
 
 func extractContentFromRequest(req *http.Request, field string) ([]byte, error) {
-	file, header, _ := req.FormFile(field)
+	file, header, err := req.FormFile(field)
+	if err != nil {
+		if err == http.ErrMissingFile {
+			return nil, nil // field is not present
+		}
+		return nil, err // form parsing error
+	}
 	if file == nil || header == nil {
 		return nil, nil // field is not present
 	}
 	buf := bytes.NewBuffer(nil)
-	_, err := io.Copy(buf, file)
+	_, err = io.Copy(buf, file)
 	if err != nil {
 		return nil, err // IO error
 	}

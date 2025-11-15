@@ -255,7 +255,11 @@ func (server *MultiTenantServer) PutWithLimit(ctx *gin.Context, log cm_logger.Lo
 	}
 	var newObjs []storage.Object
 	for _, obj := range objs {
-		n, _ := cm_repo.GetExactChartNameVersion(obj.Path)
+		n, _, err := cm_repo.GetExactChartNameVersion(obj.Path)
+		if err != nil {
+			log(cm_logger.DebugLevel, "PutWithLimit: failed to parse chart name/version", "path", obj.Path, "error", err.Error())
+			continue
+		}
 		if strings.Compare(n, name) != 0 || strings.HasSuffix(obj.Path, ".prov") {
 			continue
 		}

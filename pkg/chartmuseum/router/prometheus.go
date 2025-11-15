@@ -218,17 +218,30 @@ func (p *Prometheus) runServer() {
 
 func (p *Prometheus) getMetrics() []byte {
 	response, err := http.Get(p.Ppg.MetricsURL)
-	if err != nil && p.logger != nil {
-		p.logger.Errorf("Error fetching metrics: %q", err)
+	if err != nil {
+		if p.logger != nil {
+			p.logger.Errorf("Error fetching metrics: %q", err)
+		}
+		return []byte{}
 	}
 	defer response.Body.Close()
-	body, _ := io.ReadAll(response.Body)
+	body, err := io.ReadAll(response.Body)
+	if err != nil && p.logger != nil {
+		p.logger.Errorf("Error reading metrics response body: %q", err)
+		return []byte{}
+	}
 
 	return body
 }
 
 func (p *Prometheus) getPushGatewayURL() string {
-	h, _ := os.Hostname()
+	h, err := os.Hostname()
+	if err != nil {
+		h = "unknown"
+		if p.logger != nil {
+			p.logger.Warnf("Failed to get hostname, using 'unknown': %q", err)
+		}
+	}
 	if p.Ppg.Job == "" {
 		p.Ppg.Job = "gin"
 	}
